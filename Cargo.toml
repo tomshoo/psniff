@@ -1,0 +1,11 @@
+[package]
+name = "pkit"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pcap = "0.11.0"
+etherparse = "0.12.0"
+derive_builder = "0.11.2"
