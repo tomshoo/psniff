@@ -28,6 +28,10 @@ fn main() -> Result<()> {
         .open()?;
 
     loop {
-        pkit::analyze_packet(capture.next_packet()?);
+        match capture.next_packet() {
+            Ok(packet) => pkit::analyze_packet(packet),
+            Err(pcap::Error::TimeoutExpired) => (),
+            Err(e) => Err(e)?,
+        }
     }
 }

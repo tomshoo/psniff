@@ -9,3 +9,4 @@ edition = "2021"
 pcap = "0.11.0"
 etherparse = "0.12.0"
 derive_builder = "0.11.2"
+phf = { version = "0.11.1", features=["macros"] }

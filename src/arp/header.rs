@@ -1,6 +1,7 @@
+use crate::traits::Parsible;
 use derive_builder::Builder;
 
-use crate::{ethertype::EtherType, error::Error};
+use crate::{error::Error, ethertype::EtherType};
 
 #[allow(unused)]
 #[derive(Builder, Debug)]
@@ -16,13 +17,11 @@ pub struct ArpHeader<'a> {
     rcv_praddr: &'a [u8],
 }
 
-
 impl From<ArpHeaderBuilderError> for crate::error::Error {
     fn from(err: ArpHeaderBuilderError) -> Self {
         Error::new(crate::error::ErrorKind::General, Some(err.to_string()))
     }
 }
-
 
 #[allow(unused)]
 impl<'a, 'b: 'a> TryFrom<&'b [u8]> for ArpHeader<'a> {
@@ -53,15 +52,23 @@ impl<'a, 'b: 'a> TryFrom<&'b [u8]> for ArpHeader<'a> {
     }
 }
 
-
 #[allow(dead_code)]
 impl<'a> ArpHeader<'a> {
     pub fn from_slice<'b: 'a>(slice: &'b [u8]) -> crate::Result<(ArpHeader<'a>, &'b [u8])> {
-        let addrsize = (slice[4] + slice[5]) as usize;
+        let header = Self::try_from(slice)?;
+        let header_size = (header.hwsize + header.prsize) as usize * 2 + 8;
 
-        Ok((
-            Self::try_from(&slice[..8 + 2 * addrsize])?,
-            &slice[8 + 2 * addrsize..],
-        ))
+        Ok((header, &slice[header_size..]))
+    }
+}
+
+impl<'a, 'p: 'a> Parsible<'p> for ArpHeader<'a> {
+    type Error = Error;
+    fn parse(slice: &'p [u8]) -> crate::Result<(Self, &[u8])>
+    where
+        Self: TryFrom<&'p [u8]>,
+        'p: 'a,
+    {
+        Self::from_slice(slice)
     }
 }
