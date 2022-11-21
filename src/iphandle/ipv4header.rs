@@ -1,6 +1,6 @@
 use derive_builder::Builder;
 
-use crate::{error::Error, marker::PacketHeader, traits::Parsible};
+use crate::{error::Error, traits::Parsible};
 
 #[allow(dead_code)]
 #[derive(Debug, Builder)]
@@ -22,8 +22,6 @@ pub struct Ipv4Header {
 
     options: Vec<u8>,
 }
-
-impl PacketHeader for Ipv4Header {}
 
 impl From<Ipv4HeaderBuilderError> for crate::error::Error {
     fn from(err: Ipv4HeaderBuilderError) -> Self {

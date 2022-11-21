@@ -2,7 +2,7 @@ pub mod arp;
 pub mod error;
 pub mod ethertype;
 pub mod iphandle;
-pub mod marker;
+pub mod listener;
 pub mod traits;
 
 pub mod handlers;
@@ -25,6 +25,30 @@ pub fn raw_packet(slice: &[u8]) -> Option<()> {
 fn print_as_bytes(packet: &[u8]) {
     println!("Hex: {:x?}", packet);
     println!("Dec: {:?}", packet);
+}
+
+#[allow(unreachable_patterns)]
+fn handle(packet: &[u8], etype: EtherType) {
+    match etype {
+        EtherType::Arp => {
+            let (header, residue) = parse::<crate::arp::ArpHeader>(packet).unwrap();
+            println!("{:?}", header);
+            print_as_ascii(residue);
+        }
+        EtherType::Ipv4 => {
+            let (header, residue) =
+                parse::<crate::iphandle::ipv4header::Ipv4Header>(packet).unwrap();
+            println!("{:?}", header);
+            print_as_ascii(residue);
+        }
+        EtherType::Ipv6 => {
+            let (header, residue) =
+                parse::<crate::iphandle::ipv6header::Ipv6Header>(packet).unwrap();
+            println!("{:?}", header);
+            print_as_ascii(residue);
+        }
+        _ => {}
+    }
 }
 
 fn print_as_ascii(slice: &[u8]) {
@@ -53,17 +77,7 @@ pub fn analyze_packet(packet: pcap::Packet) {
 
         println!("{:?}", ethdr);
 
-        let packet = match etype {
-            EtherType::Ipv4 => {
-                dbg!(parse::<crate::iphandle::ipv4header::Ipv4Header>(etdata).unwrap()).1
-            }
-            EtherType::Ipv6 => {
-                dbg!(parse::<crate::iphandle::ipv6header::Ipv6Header>(etdata).unwrap()).1
-            }
-            EtherType::Arp => dbg!(parse::<crate::arp::ArpHeader>(etdata).unwrap()).1,
-        };
-
-        print_as_ascii(packet)
+        handle(etdata, etype);
     } else {
         print_as_bytes(packet.data)
     }
