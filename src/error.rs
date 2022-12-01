@@ -15,7 +15,9 @@ pub struct Error {
 
 #[allow(dead_code)]
 impl Error {
-    pub fn new(kind: ErrorKind, msg: Option<String>) -> Self { Self { kind, msg } }
+    pub fn new(kind: ErrorKind, msg: Option<String>) -> Self {
+        Self { kind, msg }
+    }
 
     fn kind(&self) -> ErrorKind {
         self.kind
@@ -49,6 +51,15 @@ impl From<String> for Error {
         Self {
             kind: ErrorKind::General,
             msg: Some(msg),
+        }
+    }
+}
+
+impl From<&'_ str> for Error {
+    fn from(err: &'_ str) -> Self {
+        Self {
+            kind: ErrorKind::General,
+            msg: Some(err.to_string()),
         }
     }
 }

@@ -5,10 +5,10 @@ use crate::traits::Parsible;
 
 pub fn parse<'a, P>(slice: &'a [u8]) -> crate::Result<(P, &[u8])>
 where
-    P: Parsible<'a> + TryFrom<&'a [u8], Error = <P as Parsible<'a>>::Error>,
-    crate::error::Error: From<<P as Parsible<'a>>::Error>,
+  P: Parsible<'a> + TryFrom<&'a [u8], Error = <P as Parsible<'a>>::Error>,
+  crate::error::Error: From<<P as Parsible<'a>>::Error>,
 {
-    P::parse(slice)
+  P::parse(slice)
 }
 
 // pub fn ether_handle(packet: &[u8], etype: Option<EtherType>) {
